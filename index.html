@@ -128,7 +128,7 @@
           <button type="button" class="level-nav" id="nextLevel" aria-label="進んだレベルへ行く" title="進んだレベルへ行く" disabled>▶</button>
         </div>
       </div>
-      <div class="stats"><span>うごかした回数 <strong id="moves">0</strong></span><span id="difficulty" class="small-note">やさしい問題からスタート</span></div>
+      <div class="stats"><span>うごかした回数 <strong id="moves">0</strong></span></div>
       <div class="board-zone" id="boardZone">
         <div class="frame" id="frame">
           <div class="track mode3" id="track" aria-label="スライドパズルの盤面" role="group"></div>
@@ -160,7 +160,7 @@
   'use strict';
   const $ = id=>document.getElementById(id);
   const zone=$('boardZone'),frame=$('frame'),track=$('track'),message=$('message'),movesEl=$('moves'),levelEl=$('level');
-  const hintBtn=$('hintBtn'),undoBtn=$('undoBtn'),mainBtn=$('mainBtn'),difficulty=$('difficulty'),prevLevelBtn=$('prevLevel'),nextLevelBtn=$('nextLevel');
+  const hintBtn=$('hintBtn'),undoBtn=$('undoBtn'),mainBtn=$('mainBtn'),prevLevelBtn=$('prevLevel'),nextLevelBtn=$('nextLevel');
   const infoModal=$('infoModal'),openInfoBtn=$('openInfoBtn'),closeInfoBtn=$('closeInfo');
   const gameState={size:3,level:{3:1,4:1},unlocked:{3:1,4:1},board:[],start:[],moves:0,started:false,solved:false,history:[],scramble:[],hint:0,hintRequest:0};
   const s=gameState;
@@ -194,7 +194,6 @@
     hintBtn.disabled=!s.started||s.solved;undoBtn.disabled=!s.started||s.solved||s.history.length===0;
     mainBtn.textContent=!s.started?'▶ スタート':s.solved?'✨ つぎの問題へ':'🔀 べつの問題';
     mainBtn.className='action '+(!s.started?'start':s.solved?'next':'skip');
-    difficulty.textContent=!s.started?'やさしい問題からスタート':s.solved?'できた！':'数字を順番にそろえよう';
   }
   function relayout(){
     const r=zone.getBoundingClientRect();const side=Math.max(120,Math.floor(Math.min(r.width-4,r.height-4,490)));
