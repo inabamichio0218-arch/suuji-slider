@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="すうじスライダー">
   <meta name="description" content="数字を順番に並べる、昔なつかしいスライドパズル。3×3と4×4に挑戦しよう！">
   <title>すうじスライダー｜PowerPoint Webアプリ</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <style>
     :root { --chalk:#31594a; --ink:#263743; --cream:#fff5dc; --wood:#b98250; --navy:#17354b; }
     *,*::before,*::after {box-sizing:border-box}
@@ -153,6 +154,10 @@
       .message {height:18px;}
     }
 
+
+    /* facebook-inapp-fix-v23: keep this screen fixed during single-finger swipes;
+       leave native two-finger pinch gestures available. */
+    html, body, .app { touch-action: pinch-zoom; }
   </style>
 </head>
 <body>
@@ -205,6 +210,13 @@
 <script>
 (()=>{
   'use strict';
+  // facebook-inapp-fix-v23: avoid browser page-panning while playing.
+  // A tap has no touchmove, so the original tile-click and button-click handlers remain intact.
+  // A two-finger gesture is not cancelled.
+  document.getElementById('app').addEventListener('touchmove', function (event) {
+    if (event.touches.length === 1 && event.cancelable) event.preventDefault();
+  }, { passive: false });
+
   const $ = id=>document.getElementById(id);
   const zone=$('boardZone'),frame=$('frame'),track=$('track'),message=$('message'),movesEl=$('moves'),levelEl=$('level');
   const hintBtn=$('hintBtn'),undoBtn=$('undoBtn'),mainBtn=$('mainBtn'),prevLevelBtn=$('prevLevel'),nextLevelBtn=$('nextLevel');
