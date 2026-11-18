@@ -231,7 +231,7 @@
   function goal(n){return Array.from({length:n*n},(_,i)=> (i+1)%(n*n));}
   function isGoal(b){return b.every((x,i)=>x===(i+1)%b.length);}
   function currentLevel(){return s.level[s.size];}
-  function trySave(){try{localStorage.setItem('number-slider-progress',JSON.stringify({level:s.level,unlocked:s.unlocked}));localStorage.setItem('number-slider-levels',JSON.stringify(s.unlocked))}catch(e){}}
+  function trySave(){/* 文化祭モード：レベルは保存せず、次の来場者はレベル1から */}
   function getShuffleCount(){const i=currentLevel()-1;const table=s.size===3?[2,3,4,5,6,8,10,12,14,16,18,20,22,24]:[2,3,4,5,6,7,8,10,12,14,16,18,20];return table[Math.min(i,table.length-1)]+Math.max(0,i-(table.length-1))*2;}
   function randomPuzzle(){
     const n=s.size,b=goal(n),count=getShuffleCount();let z=n*n-1,prev=-1;const used=new Set([b.join(',')]),shuffle=[];
@@ -400,17 +400,22 @@
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!infoModal.hidden)closeInfo();});
 
   $('mode3').addEventListener('click',()=>chooseSize(3));$('mode4').addEventListener('click',()=>chooseSize(4));
+  // 文化祭モード：前回遊んだ人のレベルを復元しません。
+  // 過去のバージョンで保存したレベルも削除します。
   try{
-    const progress=JSON.parse(localStorage.getItem('number-slider-progress')||'null');
-    const legacy=JSON.parse(localStorage.getItem('number-slider-levels')||'{}');
-    for(const n of [3,4]){
-      const unlocked=progress?.unlocked?.[n]??legacy[n];
-      const chosen=progress?.level?.[n]??unlocked;
-      if(Number.isInteger(unlocked)&&unlocked>0&&unlocked<999)s.unlocked[n]=unlocked;
-      if(Number.isInteger(chosen)&&chosen>0&&chosen<=s.unlocked[n])s.level[n]=chosen;
-    }
+    localStorage.removeItem('number-slider-progress');
+    localStorage.removeItem('number-slider-levels');
   }catch(e){}
-  s.board=goal(3);render();new ResizeObserver(relayout).observe(zone);window.addEventListener('resize',relayout);window.addEventListener('pageshow',()=>{document.documentElement.scrollLeft=0;document.body.scrollLeft=0;requestAnimationFrame(relayout);});
+  // ブラウザーの「戻る」で以前の画面が復元された場合も初期化します。
+  function resetForNewVisitor(){
+    s.size=3;s.level={3:1,4:1};s.unlocked={3:1,4:1};
+    s.board=goal(3);s.start=[];s.moves=0;s.started=false;s.solved=false;
+    s.history=[];s.scramble=[];s.hint=0;s.hintRequest++;
+    moveLock=false;clearBurst();closeInfo();
+    if(worker){worker.terminate();worker=null;}
+    setMessage('数字を順番にならべよう！');render();
+  }
+  s.board=goal(3);render();new ResizeObserver(relayout).observe(zone);window.addEventListener('resize',relayout);window.addEventListener('pageshow',(event)=>{if(event.persisted)resetForNewVisitor();document.documentElement.scrollLeft=0;document.body.scrollLeft=0;requestAnimationFrame(relayout);});
 })();
 </script>
 </body>
